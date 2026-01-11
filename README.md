@@ -4,6 +4,8 @@ Minimal Claude Code alternative. Single Python file, zero dependencies, ~250 lin
 
 Built using Claude Code, then used to build itself.
 
+![screenshot](screenshot.png)
+
 ## Features
 
 - Full agentic loop with tool use
