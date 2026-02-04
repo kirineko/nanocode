@@ -54,6 +54,33 @@ def bash(args):
     return "".join(output_lines).strip() or "(empty)"
 
 
+def read_file(args):
+    path = args["path"]
+    if not os.path.exists(path):
+        return f"error: file not found: {path}"
+    with open(path, "r") as f:
+        content = f.read()
+    lines = content.split("\n")
+    numbered = [f"{i+1:4} | {line}" for i, line in enumerate(lines)]
+    return "\n".join(numbered)
+
+
+def write_file(args):
+    path = args["path"]
+    content = args["content"]
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w") as f:
+        f.write(content)
+    lines = len(content.split("\n"))
+    return f"wrote {lines} lines to {path}"
+
+
+def glob(args):
+    pattern = args["pattern"]
+    matches = globlib.glob(pattern, recursive=True)
+    return "\n".join(sorted(matches)) if matches else "(no matches)"
+
+
 # --- Tool definitions: (description, schema, function) ---
 
 TOOLS = {
@@ -61,6 +88,21 @@ TOOLS = {
         "Run shell command",
         {"cmd": "string"},
         bash,
+    ),
+    "read_file": (
+        "Read file content with line numbers",
+        {"path": "string"},
+        read_file,
+    ),
+    "write_file": (
+        "Write content to file (creates dirs if needed)",
+        {"path": "string", "content": "string"},
+        write_file,
+    ),
+    "glob": (
+        "Find files matching pattern (supports **)",
+        {"pattern": "string"},
+        glob,
     ),
 }
 
