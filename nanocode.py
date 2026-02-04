@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 import urllib.request
+import urllib.parse
 
 OPENROUTER_KEY = os.environ.get("OPENROUTER_API_KEY")
 API_URL = (
@@ -81,6 +82,42 @@ def glob(args):
     return "\n".join(sorted(matches)) if matches else "(no matches)"
 
 
+def web_search(args):
+    query = args["query"]
+    encoded_query = urllib.parse.quote(query)
+    url = f"https://html.duckduckgo.com/html/?q={encoded_query}"
+    
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        },
+    )
+    
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            html = response.read().decode("utf-8")
+    except Exception as e:
+        return f"search error: {e}"
+    
+    # Parse results from DuckDuckGo HTML
+    results = []
+    # Match result blocks: title, url, snippet
+    pattern = r'<a[^>]*class="result__a"[^>]*href="([^"]*)"[^>]*>(.+?)</a>.*?<a[^>]*class="result__snippet"[^>]*>(.+?)</a>'
+    matches = re.findall(pattern, html, re.DOTALL)
+    
+    for url, title, snippet in matches[:5]:  # Top 5 results
+        # Clean HTML tags
+        title = re.sub(r"<[^>]+>", "", title).strip()
+        snippet = re.sub(r"<[^>]+>", "", snippet).strip()
+        # Decode URL redirect
+        if "uddg=" in url:
+            url = urllib.parse.unquote(url.split("uddg=")[1].split("&")[0])
+        results.append(f"**{title}**\n{url}\n{snippet}\n")
+    
+    return "\n".join(results) if results else "no results found"
+
+
 # --- Tool definitions: (description, schema, function) ---
 
 TOOLS = {
@@ -103,6 +140,11 @@ TOOLS = {
         "Find files matching pattern (supports **)",
         {"pattern": "string"},
         glob,
+    ),
+    "web_search": (
+        "Search the web using DuckDuckGo, returns top results with titles, URLs and snippets",
+        {"query": "string"},
+        web_search,
     ),
 }
 

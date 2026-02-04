@@ -32,6 +32,7 @@ python3 nanocode.py
 - 工具调用会在终端中以简要预览的形式回显结果
 
 **修改记录**
+
 第一次修改提示词：
 > 我在做一个最小的Coding Agent nanocode.py,现在请帮我添加文件操作工具
 
@@ -77,10 +78,27 @@ python3 nanocode.py
 - 相同的命令：`/q` 或 `exit` 退出，`/c` 清空对话
 - 支持 OpenRouter 和 Anthropic API
 
-运行方式：
-```bash
-node nanocode.js
-# 或
-./nanocode.js
+运行方式：node nanocode.js 或 ./nanocode.js
 ```
+
+第三次修改提示词：
+> （运行nanocode.js）给nanocode.py加上web search tool
+
+结果：
+```
+⏺ Read_file(nanocode.py)
+  ⎿     1 | #!/usr/bin/env python3 ... +251 lines
+
+⏺ 现在我来添加一个 web search 工具。我会使用 DuckDuckGo 的 HTML 搜索（无需 API key）：
+
+⏺ Write_file(nanocode.py)
+  ⎿  wrote 294 lines to nanocode.py
+
+⏺ 已添加 `web_search` 工具。功能：
+
+- 使用 DuckDuckGo HTML 搜索（无需 API key）
+- 返回前 5 个结果，包含标题、URL 和摘要
+- 参数：`query` (搜索关键词)
+
+使用示例：当你问 "最新的 Python 3.12 有什么新特性" 时，Claude 可以调用 `web_search` 搜索相关信息。
 ```
