@@ -102,3 +102,30 @@ python3 nanocode.py
 
 使用示例：当你问 "最新的 Python 3.12 有什么新特性" 时，Claude 可以调用 `web_search` 搜索相关信息。
 ```
+
+第四次修改提示词：
+> （运行nanocode.py）帮我为nanocode.py添加一个gh tools,可以执行github cli命令
+
+结果：
+```
+⏺ Read_file(nanocode.py)
+  ⎿     1 | #!/usr/bin/env python3 ... +293 lines
+
+⏺ 我来添加一个 `gh` 工具，用于执行 GitHub CLI 命令：
+
+⏺ Write_file(nanocode.py)
+  ⎿  wrote 329 lines to nanocode.py
+
+⏺ 已添加 `gh` 工具。主要特点：
+
+1. 自动补全 `gh` 前缀：如果命令不以 `gh ` 开头，会自动添加
+2. 实时输出：和 `bash` 一样，流式显示命令输出
+3. 60秒超时：比 bash 的30秒更长，因为 GitHub API 操作可能较慢
+4. 描述中包含示例：`gh repo view`, `gh issue list`, `gh pr create` 等
+
+使用示例：
+- `gh pr list` - 列出 PR
+- `gh issue list` - 列出 issues  
+- `gh repo view` - 查看仓库信息
+- `gh release list` - 列出 releases
+```

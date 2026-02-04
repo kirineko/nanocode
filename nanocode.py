@@ -118,6 +118,36 @@ def web_search(args):
     return "\n".join(results) if results else "no results found"
 
 
+def gh(args):
+    """Execute GitHub CLI commands"""
+    cmd = args["cmd"]
+    # Ensure the command starts with 'gh'
+    if not cmd.strip().startswith("gh "):
+        cmd = f"gh {cmd}"
+    
+    proc = subprocess.Popen(
+        cmd,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    output_lines = []
+    try:
+        while True:
+            line = proc.stdout.readline()
+            if not line and proc.poll() is not None:
+                break
+            if line:
+                print(f"  {DIM}│ {line.rstrip()}{RESET}", flush=True)
+                output_lines.append(line)
+        proc.wait(timeout=60)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        output_lines.append("\n(timed out after 60s)")
+    return "".join(output_lines).strip() or "(empty)"
+
+
 # --- Tool definitions: (description, schema, function) ---
 
 TOOLS = {
@@ -145,6 +175,11 @@ TOOLS = {
         "Search the web using DuckDuckGo, returns top results with titles, URLs and snippets",
         {"query": "string"},
         web_search,
+    ),
+    "gh": (
+        "Execute GitHub CLI (gh) commands. Examples: 'gh repo view', 'gh issue list', 'gh pr create', 'gh pr list', 'gh release list'",
+        {"cmd": "string"},
+        gh,
     ),
 }
 
